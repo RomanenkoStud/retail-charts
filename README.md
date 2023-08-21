@@ -1,8 +1,27 @@
-# React + Vite
+# Retail Charts Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Retail Charts Dashboard is a web application that visualizes retail data using interactive pie charts and time series charts. Users can explore different parameters, categories, and date ranges to gain insights into the retail data.
 
-Currently, two official plugins are available:
+## Installation and Usage
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/RomanenkoStud/retail-charts.git
+
+2. Navigate to the project directory:
+
+    ```sh
+    cd retail-charts
+
+3. Install dependencies:
+
+    ```sh
+    npm install
+
+4. Start the development server:
+
+    ```sh
+    npm run dev
+
+5. Open your web browser and navigate to http://localhost:5173 to access the Retail Charts Dashboard.
