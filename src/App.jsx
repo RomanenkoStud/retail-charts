@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import * as d3 from 'd3';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { CssBaseline, Box } from '@mui/material';
-
 import { NavBar } from './components/NavBar';
 import { PieChart } from './components/PieChart';
 import { TimeSeries } from './components/TimeSeries';
@@ -27,6 +26,21 @@ const initialState = {
   selectedDateRange: [],
 };
 
+const HomePage = () => (
+  <Box>
+    <h1>Welcome to Dashboard!</h1>
+    {PAGES.map((page) => (
+      <Link 
+        key={page.title} 
+        to={page.route} 
+        style={{ textDecoration: 'none' }}
+      >
+        <h2>Go to {page.title}</h2>
+      </Link>
+    ))}
+  </Box>
+);
+
 function App() {
   const [data, setData] = useState([]);
   const [filters, setFilters] = useState(initialState);
@@ -40,21 +54,6 @@ function App() {
       setData(loadedData);
     });
   }, []);
-
-  const HomePage = () => (
-    <Box>
-      <h1>Welcome to Dashboard!</h1>
-      {PAGES.map((page) => (
-        <Link 
-          key={page.title} 
-          to={page.route} 
-          style={{ textDecoration: 'none' }}
-        >
-          <h2>Go to {page.title}</h2>
-        </Link>
-      ))}
-    </Box>
-  );
 
   return (
     <Router>

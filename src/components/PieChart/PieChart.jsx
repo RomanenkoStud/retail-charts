@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 import crossfilter from 'crossfilter2';
 import { getCategoryDimension, getDateDimension } from '../../utils/dataManipulation';
 import './PieChart.scss';
+import 'dc/dist/style/dc.css';
 
 export const PieChart = ({
     data,
@@ -48,7 +49,7 @@ export const PieChart = ({
             .slicesCap(10)
             .legend(dc.legend())
             .transitionDuration(0)
-            .on('postRedraw', () => {
+            .on('filtered', () => {
                 setSelectedCategories(chart.filters())
             })
             .emptyTitle('select date range');
@@ -63,10 +64,6 @@ export const PieChart = ({
         };
     }, [
         data,
-        selectedParameter, 
-        selectedCategories,
-        selectedDateRange,
-        setSelectedCategories
     ]);
 
     return (

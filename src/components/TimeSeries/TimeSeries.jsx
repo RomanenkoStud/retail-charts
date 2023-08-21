@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import crossfilter from 'crossfilter2';
 import PropTypes from 'prop-types';
 import { getCategoryDimension, getDateDimension, getMaxDateRange } from '../../utils/dataManipulation';
+import 'dc/dist/style/dc.css';
 
 export const TimeSeries = ({
     data,
@@ -39,7 +40,7 @@ export const TimeSeries = ({
             .group(parameterGroup)
             .x(d3.scaleTime().domain(getMaxDateRange(dateDim)))
             .brushOn(true)
-            .on('postRedraw', () => {
+            .on('filtered', () => {
                 setSelectedDateRange(chart.filter() || [])
             });
 
@@ -55,10 +56,6 @@ export const TimeSeries = ({
         };
     }, [
         data,
-        selectedParameter, 
-        selectedCategories,
-        selectedDateRange,
-        setSelectedDateRange
     ]);
 
     return (
