@@ -7,12 +7,13 @@ import { NavBar } from './components/NavBar';
 import { PieChart } from './components/PieChart';
 import { TimeSeries } from './components/TimeSeries';
 import { SelectedFilters } from './components/SelectedFilters';
+import { baseUrl } from './baseUrl';
 import './App.scss';
 
 const CSV_FILE_PATH = './data.csv';
 const PAGES = [
-  {title: 'Pie Chart', route: '/pie'},
-  {title: 'Time Series Chart', route: '/timeseries'},
+  {title: 'Pie Chart', route: `${baseUrl}pie`},
+  {title: 'Time Series Chart', route: `${baseUrl}timeseries`},
 ];
 const PARAMETERS = [
   'markdown', 
@@ -71,10 +72,10 @@ function App() {
       />
       <Box>
         <Routes>
-          <Route path="/" element={
+          <Route path={baseUrl} element={
             <HomePage/>
           } />
-          <Route path="/pie" element={
+          <Route path={`${baseUrl}pie`} element={
             <PieChart
               data={data} 
               filters={filters}
@@ -83,7 +84,7 @@ function App() {
               }}
             />
           } />
-          <Route path="/timeseries" element={
+          <Route path={`${baseUrl}timeseries`} element={
             <TimeSeries
               data={data}
               filters={filters}

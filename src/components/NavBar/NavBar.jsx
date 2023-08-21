@@ -9,6 +9,7 @@ import {
     Select,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { baseUrl } from '../../baseUrl';
 
 export const NavBar = ({ 
     pages,
@@ -64,7 +65,7 @@ export const NavBar = ({
         <AppBar component="nav">
             <Toolbar>
                 <Link
-                    to="/"
+                    to={baseUrl}
                     style={{ flexGrow: 1, textDecoration: 'none' }}
                 >
                     <Typography
