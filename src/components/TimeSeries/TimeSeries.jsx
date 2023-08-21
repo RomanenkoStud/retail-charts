@@ -1,24 +1,33 @@
 import { useEffect, useRef } from 'react';
 import * as dc from 'dc';
 import * as d3 from 'd3';
+import crossfilter from 'crossfilter2';
 import PropTypes from 'prop-types';
-import { getMaxDateRange, getDateDimension } from '../../utils/dataManipulation';
+import { getCategoryDimension, getDateDimension, getMaxDateRange } from '../../utils/dataManipulation';
 
-export const TimeSeries = ({ 
-    data, 
-    selectedParameter, 
-    selectedCategories, 
-    dateRange, updateDateRange 
+export const TimeSeries = ({
+    data,
+    filters: {
+        selectedParameter, 
+        selectedCategories,
+        selectedDateRange
+    },
+    setSelectedDateRange,
 }) => {
     const chartRef = useRef();
 
     useEffect(() => {
-        const filteredData = selectedCategories.length > 0
-            ? data.filter(d => selectedCategories.includes(d.category_desc))
-            : data;
+        const ndx = crossfilter(data);
+        
+        // Create dimensions
+        const dateDim = getDateDimension(ndx);
 
-        const dateDim = getDateDimension(filteredData);
+        const categoryDim = getCategoryDimension(ndx);
+        if(selectedCategories && selectedCategories.length > 0) {
+            categoryDim.filterFunction(d => selectedCategories.includes(d));
+        }
 
+        // Create group
         const parameterGroup = dateDim.group().reduceSum(d => d[selectedParameter]);
         
         const chart = dc.lineChart(chartRef.current);
@@ -31,20 +40,26 @@ export const TimeSeries = ({
             .x(d3.scaleTime().domain(getMaxDateRange(dateDim)))
             .brushOn(true)
             .on('postRedraw', () => {
-                if (chart.filter()) {
-                    const [start, end] = chart.filter();
-                    updateDateRange([start, end]);
-                }
-            })
-            .render();
+                setSelectedDateRange(chart.filter() || [])
+            });
 
-        chart.filter(dateRange);
+        if (selectedDateRange && selectedDateRange.length > 0) {
+            chart.filter(selectedDateRange);
+        }
+
+        chart.render();
 
         // Clean up
         return () => {
-        dc.chartRegistry.clear();
+            dc.chartRegistry.clear();
         };
-    }, [data, selectedParameter, selectedCategories, dateRange, updateDateRange]);
+    }, [
+        data,
+        selectedParameter, 
+        selectedCategories,
+        selectedDateRange,
+        setSelectedDateRange
+    ]);
 
     return (
         <div>
@@ -56,8 +71,10 @@ export const TimeSeries = ({
 
 TimeSeries.propTypes = {
     data: PropTypes.array.isRequired,
-    selectedParameter: PropTypes.oneOf(['markdown', 'revenues', 'margin']).isRequired,
-    selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
-    dateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)).isRequired,
-    updateDateRange: PropTypes.func.isRequired,
+    filters: PropTypes.shape({
+        selectedParameter: PropTypes.string.isRequired,
+        selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
+        selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
+    }).isRequired,
+    setSelectedDateRange: PropTypes.func.isRequired,
 };

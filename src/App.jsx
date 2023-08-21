@@ -1,91 +1,100 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react';
 import * as d3 from 'd3';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { CssBaseline, Box } from '@mui/material';
-import { NavBar } from './components/NavBar'
-import { PieChart } from './components/PieChart'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import eng from 'date-fns/locale/en-US';
-import './App.scss';
-import { TimeSeries } from './components/TimeSeries';
-import { getMaxDateRange, getDateDimension } from './utils/dataManipulation';
-import { CustomDatePicker } from './components/CustomDatePicker';
 
-const pages = [
-  {title: 'Pie Chart', route: '/'},
+import { NavBar } from './components/NavBar';
+import { PieChart } from './components/PieChart';
+import { TimeSeries } from './components/TimeSeries';
+import { SelectedFilters } from './components/SelectedFilters';
+import './App.scss';
+
+const CSV_FILE_PATH = './data.csv';
+const PAGES = [
+  {title: 'Pie Chart', route: '/pie'},
   {title: 'Time Series Chart', route: '/timeseries'},
 ];
+const PARAMETERS = [
+  'markdown', 
+  'revenues', 
+  'margin'
+];
 
-const csvFilePath = './data.csv';
+const initialState = {
+  selectedParameter: PARAMETERS[0],
+  selectedCategories: [],
+  selectedDateRange: [],
+};
 
 function App() {
-  const [dateRange, setDateRange] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
   const [data, setData] = useState([]);
+  const [filters, setFilters] = useState(initialState);
 
-  const [startDate, endDate] = dateRange;
-
-  const maxDateRange = useMemo(() => {
-    return getMaxDateRange(getDateDimension(data));
-  }, [data]);
+  const resetFilters = () => {
+    setFilters(initialState);
+  };
 
   useEffect(() => {
-    d3.csv(csvFilePath).then((loadedData) => {
+    d3.csv(CSV_FILE_PATH).then((loadedData) => {
       setData(loadedData);
     });
   }, []);
 
+  const HomePage = () => (
+    <Box>
+      <h1>Welcome to Dashboard!</h1>
+      {PAGES.map((page) => (
+        <Link 
+          key={page.title} 
+          to={page.route} 
+          style={{ textDecoration: 'none' }}
+        >
+          <h2>Go to {page.title}</h2>
+        </Link>
+      ))}
+    </Box>
+  );
+
   return (
     <Router>
-    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={eng}>
       <CssBaseline />
-      <NavBar pages={pages} />
-      <Box
-        sx={{ pt: 10 }}
-      >
-
-        <Box>
-
-        <CustomDatePicker 
-          maxDateRange={maxDateRange}
-          dateRange={dateRange}
-          setDateRange={(newDateRange) => {
-            setDateRange(newDateRange)
-          }}
-        />
-          <Routes>
-            <Route path="/" element={
-              <>
-                <h1>Welcome to the Dashboard</h1>
-                <Box>
-                  <PieChart 
-                    data={data}
-                    selectedParameter="markdown"
-                    dateRange={[startDate, endDate]}
-                    selectedCategories={selectedCategories}
-                    setSelectedCategories={(newCategories) => {
-                      setSelectedCategories(newCategories)
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <TimeSeries 
-                    data={data} 
-                    selectedParameter="markdown"
-                    dateRange={dateRange}
-                    updateDateRange={(newDateRange) => {
-                      setDateRange(newDateRange)
-                    }}
-                    selectedCategories={selectedCategories}
-                  />
-                </Box>
-              </>
-            } />
-          </Routes>
-        </Box>
+      <NavBar 
+        pages={PAGES}
+        dropDownValues={PARAMETERS}
+        selected={filters.selectedParameter}
+        setSelected={(newParameter) => {
+          setFilters({ ...filters, selectedParameter: newParameter });
+        }}
+        onReset={() => {
+          resetFilters();
+        }}
+      />
+      <Box>
+        <Routes>
+          <Route path="/" element={
+            <HomePage/>
+          } />
+          <Route path="/pie" element={
+            <PieChart
+              data={data} 
+              filters={filters}
+              setSelectedCategories={(newCategories) => {
+                setFilters({ ...filters, selectedCategories: newCategories });
+              }}
+            />
+          } />
+          <Route path="/timeseries" element={
+            <TimeSeries
+              data={data}
+              filters={filters}
+              setSelectedDateRange={(newDateRange) => {
+                setFilters({ ...filters, selectedDateRange: newDateRange });
+              }}
+            />
+          } />
+        </Routes>
       </Box>
-    </LocalizationProvider>
+      <SelectedFilters filters={filters}/>
     </Router>
   )
 }

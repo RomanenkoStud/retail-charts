@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-import crossfilter from 'crossfilter2';
 
 export const getDate = (data) => {
     if(!data) {
@@ -10,16 +9,11 @@ export const getDate = (data) => {
     return d3.timeWeek.offset(new Date(year, 0, 1), week - 1);
 }
 
-export const getCategoryDimension = (data) => {
-    // Create a crossfilter instance
-    const ndx = crossfilter(data);
-
+export const getCategoryDimension = (ndx) => {
     return ndx.dimension((dataElement) => dataElement.category_desc);
 }
 
-export const getDateDimension = (data) => {
-    const ndx = crossfilter(data);
-
+export const getDateDimension = (ndx) => {
     return ndx.dimension(d => {
         const year = +d.year_ref;
         const week = +d.week_ref;

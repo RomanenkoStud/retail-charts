@@ -2,46 +2,44 @@ import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import * as dc from 'dc';
 import * as d3 from 'd3';
-import { getDate, getCategoryDimension } from '../../utils/dataManipulation';
+import crossfilter from 'crossfilter2';
+import { getCategoryDimension, getDateDimension } from '../../utils/dataManipulation';
 import './PieChart.scss';
 
-export const PieChart = ({ 
-    data, 
-    selectedParameter, 
-    dateRange,
-    selectedCategories,
-    setSelectedCategories,
+export const PieChart = ({
+    data,
+    filters: {
+        selectedParameter, 
+        selectedCategories,
+        selectedDateRange
+    },
+    setSelectedCategories
 }) => {
     const chartRef = useRef();
 
     useEffect(() => {
-        // Create dimensions and groups
-        const categoryDim = getCategoryDimension(data);
-        const selectedParameterGroup = categoryDim.group().reduceSum((dataElement) => {
-        if (dateRange.length === 2) {
-            const [startDate, endDate] = dateRange;
+        const ndx = crossfilter(data);
+        
+        // Create dimensions
+        const categoryDim = getCategoryDimension(ndx);
 
-            const date = getDate(dataElement);
-
-            if (
-            (date >= startDate) && (date <= endDate)
-            ) {
-                return dataElement[selectedParameter];
-            } else {
-                return 0;
-            }
+        const dateDim = getDateDimension(ndx);
+        if(selectedDateRange && selectedDateRange.length > 0) {
+            dateDim.filterRange(selectedDateRange);
         }
 
-        return 0;
+        // Create group
+        const selectedParameterGroup = categoryDim.group().reduceSum((dataElement) => {
+            return dataElement[selectedParameter];
         });
 
         // Set a different color scheme using dc.config.defaultColors
         dc.config.defaultColors(d3.schemeSet2);
 
         // Create a pie chart
-        const pieChart = dc.pieChart(chartRef.current);
+        const chart = dc.pieChart(chartRef.current);
 
-        pieChart
+        chart
             .width(600)
             .height(300)
             .dimension(categoryDim)
@@ -49,23 +47,26 @@ export const PieChart = ({
             .innerRadius(50)
             .slicesCap(10)
             .legend(dc.legend())
+            .transitionDuration(0)
             .on('postRedraw', () => {
-                const filters = pieChart.filters();
-                setSelectedCategories(filters);
+                setSelectedCategories(chart.filters())
             })
-            .render();
-
-        pieChart.filter(selectedCategories);
-
+            .emptyTitle('select date range');
+        
+        selectedCategories.forEach(category => {
+            chart.filter(category);
+        });
+        
+        chart.render();
         // Clean up
         return () => {
-        dc.chartRegistry.clear();
         };
     }, [
-        data, 
+        data,
         selectedParameter, 
-        dateRange, 
-        selectedCategories, setSelectedCategories
+        selectedCategories,
+        selectedDateRange,
+        setSelectedCategories
     ]);
 
     return (
@@ -77,10 +78,12 @@ export const PieChart = ({
 };
 
 PieChart.propTypes = {
-    data: PropTypes.array,
-    selectedParameter: PropTypes.oneOf(['markdown', 'revenues', 'margin']).isRequired,
-    dateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)).isRequired,
-    selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
+    data: PropTypes.array.isRequired,
+    filters: PropTypes.shape({
+        selectedParameter: PropTypes.string.isRequired,
+        selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
+        selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
+    }).isRequired,
     setSelectedCategories: PropTypes.func.isRequired,
 };
 
