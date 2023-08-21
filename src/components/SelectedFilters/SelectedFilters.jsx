@@ -2,11 +2,9 @@ import PropTypes from 'prop-types';
 import './SelectedFilters.scss';
 
 export const SelectedFilters = ({
-    filters: {
-        selectedParameter, 
-        selectedCategories,
-        selectedDateRange
-    },
+    selectedParameter, 
+    selectedCategories,
+    selectedDateRange,
 }) => {
     const renderMultipleSelection = (id, heading, items, formatter) => (
         <div>
@@ -65,9 +63,7 @@ export const SelectedFilters = ({
 }
 
 SelectedFilters.propTypes = {
-    filters: PropTypes.shape({
-        selectedParameter: PropTypes.string.isRequired,
-        selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
-        selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
-    }).isRequired,
+    selectedParameter: PropTypes.string.isRequired,
+    selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
+    selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
 };

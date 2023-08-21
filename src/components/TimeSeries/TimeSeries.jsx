@@ -8,11 +8,9 @@ import 'dc/dist/style/dc.css';
 
 export const TimeSeries = ({
     data,
-    filters: {
-        selectedParameter, 
-        selectedCategories,
-        selectedDateRange
-    },
+    selectedParameter, 
+    selectedCategories,
+    selectedDateRange,
     setSelectedDateRange,
 }) => {
     const chartRef = useRef();
@@ -56,6 +54,7 @@ export const TimeSeries = ({
         };
     }, [
         data,
+        selectedParameter,
     ]);
 
     return (
@@ -68,10 +67,8 @@ export const TimeSeries = ({
 
 TimeSeries.propTypes = {
     data: PropTypes.array.isRequired,
-    filters: PropTypes.shape({
-        selectedParameter: PropTypes.string.isRequired,
-        selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
-        selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
-    }).isRequired,
+    selectedParameter: PropTypes.string.isRequired,
+    selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
+    selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
     setSelectedDateRange: PropTypes.func.isRequired,
 };

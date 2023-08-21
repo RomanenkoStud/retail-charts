@@ -9,11 +9,9 @@ import 'dc/dist/style/dc.css';
 
 export const PieChart = ({
     data,
-    filters: {
-        selectedParameter, 
-        selectedCategories,
-        selectedDateRange
-    },
+    selectedParameter, 
+    selectedCategories,
+    selectedDateRange,
     setSelectedCategories
 }) => {
     const chartRef = useRef();
@@ -64,6 +62,7 @@ export const PieChart = ({
         };
     }, [
         data,
+        selectedParameter, 
     ]);
 
     return (
@@ -76,11 +75,9 @@ export const PieChart = ({
 
 PieChart.propTypes = {
     data: PropTypes.array.isRequired,
-    filters: PropTypes.shape({
-        selectedParameter: PropTypes.string.isRequired,
-        selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
-        selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
-    }).isRequired,
+    selectedParameter: PropTypes.string.isRequired,
+    selectedCategories: PropTypes.arrayOf(PropTypes.string).isRequired,
+    selectedDateRange: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
     setSelectedCategories: PropTypes.func.isRequired,
 };
 

@@ -9,22 +9,16 @@ import { SelectedFilters } from './components/SelectedFilters';
 import { baseUrl } from './baseUrl';
 import './App.scss';
 
-const CSV_FILE_PATH = './data.csv';
+const CSV_FILE_PATH = `${baseUrl}data.csv`;
 const PAGES = [
-  {title: 'Pie Chart', route: `${baseUrl}pie`},
-  {title: 'Time Series Chart', route: `${baseUrl}timeseries`},
+  {title: 'Pie Chart', route: "pie"},
+  {title: 'Time Series Chart', route: "timeseries"},
 ];
 const PARAMETERS = [
   'markdown', 
   'revenues', 
   'margin'
 ];
-
-const initialState = {
-  selectedParameter: PARAMETERS[0],
-  selectedCategories: [],
-  selectedDateRange: [],
-};
 
 const HomePage = () => (
   <Box>
@@ -43,10 +37,15 @@ const HomePage = () => (
 
 function App() {
   const [data, setData] = useState([]);
-  const [filters, setFilters] = useState(initialState);
+   // Separate state for each filter parameter
+  const [selectedParameter, setSelectedParameter] = useState(PARAMETERS[0]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedDateRange, setSelectedDateRange] = useState([]);
 
   const resetFilters = () => {
-    setFilters(initialState);
+    setSelectedParameter(PARAMETERS[0]);
+    setSelectedCategories([]);
+    setSelectedDateRange([]);
   };
 
   useEffect(() => {
@@ -56,14 +55,14 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <Router basename={baseUrl}>
       <CssBaseline />
       <NavBar 
         pages={PAGES}
         dropDownValues={PARAMETERS}
-        selected={filters.selectedParameter}
+        selected={selectedParameter}
         setSelected={(newParameter) => {
-          setFilters({ ...filters, selectedParameter: newParameter });
+          setSelectedParameter(newParameter);
         }}
         onReset={() => {
           resetFilters();
@@ -71,30 +70,38 @@ function App() {
       />
       <Box>
         <Routes>
-          <Route path={baseUrl} element={
+          <Route path="/" element={
             <HomePage/>
           } />
-          <Route path={`${baseUrl}pie`} element={
+          <Route path="pie" element={
             <PieChart
               data={data} 
-              filters={filters}
+              selectedParameter={selectedParameter}
+              selectedDateRange={selectedDateRange}
+              selectedCategories={selectedCategories}
               setSelectedCategories={(newCategories) => {
-                setFilters({ ...filters, selectedCategories: newCategories });
+                setSelectedCategories(newCategories);
               }}
             />
           } />
-          <Route path={`${baseUrl}timeseries`} element={
+          <Route path="timeseries" element={
             <TimeSeries
               data={data}
-              filters={filters}
+              selectedParameter={selectedParameter}
+              selectedDateRange={selectedDateRange}
+              selectedCategories={selectedCategories}
               setSelectedDateRange={(newDateRange) => {
-                setFilters({ ...filters, selectedDateRange: newDateRange });
+                setSelectedDateRange(newDateRange);
               }}
             />
           } />
         </Routes>
       </Box>
-      <SelectedFilters filters={filters}/>
+      <SelectedFilters 
+        selectedParameter={selectedParameter}
+        selectedDateRange={selectedDateRange}
+        selectedCategories={selectedCategories}
+      />
     </Router>
   )
 }
