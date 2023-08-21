@@ -13,8 +13,11 @@ export const SelectedFilters = ({
             <h3 className="selected__heading">{heading}</h3>
             <ul id={id} className="selected__list">
                 {items.length > 0 ? (
-                    items.map((item, index) => (
-                        <li key={index} className="selected__list-item">
+                    items.map((item) => (
+                        <li 
+                            key={formatter ? formatter(item) : item} 
+                            className="selected__list-item"
+                        >
                             {formatter ? formatter(item) : item}
                         </li>
                     ))
