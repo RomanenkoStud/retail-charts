@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as d3 from 'd3';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { CssBaseline, Box } from '@mui/material';
 import { NavBar } from './components/NavBar';
 import { PieChart } from './components/PieChart';
@@ -55,7 +55,7 @@ function App() {
   }, []);
 
   return (
-    <Router basename={baseUrl}>
+    <Router>
       <CssBaseline />
       <NavBar 
         pages={PAGES}
