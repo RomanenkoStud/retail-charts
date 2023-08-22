@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import * as dc from 'dc';
 import * as d3 from 'd3';
 import crossfilter from 'crossfilter2';
+import { useMediaQuery } from '@mui/material';
 import { getCategoryDimension, getDateDimension } from '../../utils/dataManipulation';
 import './PieChart.scss';
 import 'dc/dist/style/dc.css';
@@ -15,6 +16,7 @@ export const PieChart = ({
     setSelectedCategories
 }) => {
     const chartRef = useRef();
+    const isSmallScreen = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const ndx = crossfilter(data);
@@ -39,12 +41,12 @@ export const PieChart = ({
         const chart = dc.pieChart(chartRef.current);
 
         chart
-            .width(600)
-            .height(300)
+            .width(isSmallScreen ? 350 : 600)
+            .height(isSmallScreen ? 200 : 300)
             .dimension(categoryDim)
             .group(selectedParameterGroup)
-            .innerRadius(50)
-            .slicesCap(10)
+            .innerRadius(isSmallScreen ? 20 : 50)
+            .slicesCap(isSmallScreen ? 6 : 10)
             .legend(dc.legend())
             .transitionDuration(0)
             .on('filtered', () => {
@@ -63,6 +65,7 @@ export const PieChart = ({
     }, [
         data,
         selectedParameter, 
+        isSmallScreen
     ]);
 
     return (

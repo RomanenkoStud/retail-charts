@@ -3,6 +3,7 @@ import * as dc from 'dc';
 import * as d3 from 'd3';
 import crossfilter from 'crossfilter2';
 import PropTypes from 'prop-types';
+import { useMediaQuery } from '@mui/material';
 import { getCategoryDimension, getDateDimension, getMaxDateRange } from '../../utils/dataManipulation';
 import 'dc/dist/style/dc.css';
 
@@ -14,6 +15,7 @@ export const TimeSeries = ({
     setSelectedDateRange,
 }) => {
     const chartRef = useRef();
+    const isSmallScreen = useMediaQuery('(max-width:600px)');
 
     useEffect(() => {
         const ndx = crossfilter(data);
@@ -32,8 +34,8 @@ export const TimeSeries = ({
         const chart = dc.lineChart(chartRef.current);
 
         chart
-            .width(600)
-            .height(300)
+            .width(isSmallScreen ? 350 : 600)
+            .height(isSmallScreen ? 200 : 300)
             .dimension(dateDim)
             .group(parameterGroup)
             .x(d3.scaleTime().domain(getMaxDateRange(dateDim)))
@@ -55,6 +57,7 @@ export const TimeSeries = ({
     }, [
         data,
         selectedParameter,
+        isSmallScreen
     ]);
 
     return (
