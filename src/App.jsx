@@ -9,8 +9,6 @@ import { ChartDisplayManager } from './components/ChartDisplayManager';
 import { baseUrl } from './baseUrl';
 
 import { Home } from './pages/Home';
-import { PieChart } from './pages/PieChart';
-import { TimeSeries } from './pages/TimeSeries';
 
 import './App.scss';
 import 'dc/dist/style/dc.css';
@@ -35,8 +33,6 @@ function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedDateRange, setSelectedDateRange] = useState([]);
 
-  const [displayedChart, setDisplayedChart] = useState('none');
-
   const resetFilters = () => {
     setSelectedParameter(PARAMETERS[0]);
     setData([...data]);
@@ -55,40 +51,49 @@ function App() {
   return (
     <Router>
       <CssBaseline />
-      <NavBar 
+      <NavBar
         pages={PAGES}
         dropDownValues={PARAMETERS}
         selected={selectedParameter}
         setSelected={setSelectedParameter}
         onReset={resetFilters}
       />
-      <Box>
+      <Box maxWidth="840px">
         <Routes>
           <Route path="/" element={
             <Home pages={PAGES}/>
           } />
           <Route path="pie" element={
             <Box>
-              <PieChart setDisplayedChart={setDisplayedChart}/>
-              {isLoading && <CircularProgress />}
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <ChartDisplayManager 
+                  data={data}
+                  displayedChart="pie"
+                  selectedParameter={selectedParameter}
+                  setSelectedCategories={setSelectedCategories}
+                  setSelectedDateRange={setSelectedDateRange}
+                />
+              )}
             </Box>
           } />
           <Route path="timeseries" element={
             <Box>
-              <TimeSeries setDisplayedChart={setDisplayedChart}/>
-              {isLoading && <CircularProgress />}
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <ChartDisplayManager 
+                  data={data}
+                  displayedChart="timeseries"
+                  selectedParameter={selectedParameter}
+                  setSelectedCategories={setSelectedCategories}
+                  setSelectedDateRange={setSelectedDateRange}
+                />
+              )}
             </Box>
           } />
         </Routes>
-        {!isLoading && (
-          <ChartDisplayManager 
-            data={data}
-            displayedChart={displayedChart}
-            selectedParameter={selectedParameter}
-            setSelectedCategories={setSelectedCategories}
-            setSelectedDateRange={setSelectedDateRange}
-          />
-        )}
         <Box>
           <SelectedFilters 
             selectedParameter={selectedParameter}
